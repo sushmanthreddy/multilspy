@@ -15,6 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
@@ -31,11 +37,29 @@ jobs:
     - name: Install Solargraph
       run: gem install solargraph
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        python-version: "3.11"
-        cache: "pip"
+        node-version: '20'
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Remove problematic JDK installations
+      run: |
+        sudo rm -rf /usr/lib/jvm/temurin-8-jdk-amd64 || true
+        sudo rm -rf /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64 || true
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
 
     - name: Install dependencies
       run: |
@@ -43,9 +67,9 @@ jobs:
         pip install -r requirements.txt
         pip install -e .
 
-    - name: Test with pytest (Python and Go only for quick validation)
+    - name: Run all tests
       run: |
-        pytest tests/multilspy/test_*python*.py tests/multilspy/test_*go*.py -v --tb=short
+        pytest tests/multilspy -v --tb=short
 
   build:
     name: Build the distribution
