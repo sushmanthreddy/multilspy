@@ -45,7 +45,7 @@ jobs:
 
     - name: Test with pytest (Python and Go only for quick validation)
       run: |
-        pytest tests/multilspy/test_multilspy_python.py tests/multilspy/test_multilspy_go.py -v --tb=short
+        pytest tests/multilspy/test_*python*.py tests/multilspy/test_*go*.py -v --tb=short
 
   build:
     name: Build the distribution
@@ -76,13 +76,14 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    # Only publish on tag pushes AND only on the original repo (not forks)
+    if: startsWith(github.ref, 'refs/tags/') && github.repository == 'microsoft/multilspy'
     needs:
     - build
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/multilspy  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/multilspy
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -102,6 +103,8 @@ jobs:
     name: >-
       Sign the Python 🐍 distribution 📦 with Sigstore
       and upload them to GitHub Release
+    # Only run on the original repo (not forks)
+    if: github.repository == 'microsoft/multilspy'
     needs:
     - publish-to-pypi
     runs-on: ubuntu-latest
@@ -143,6 +146,8 @@ jobs:
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
+    # Only run on the original repo (not forks)
+    if: github.repository == 'microsoft/multilspy'
     needs:
     - build
     runs-on: ubuntu-latest
