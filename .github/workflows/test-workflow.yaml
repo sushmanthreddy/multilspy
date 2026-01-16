@@ -163,6 +163,13 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      # Remove problematic JDK installations that Eclipse JDT.LS tries to detect
+      # These have permission issues and cause JDT.LS initialization to fail
+      - name: Remove problematic JDK installations
+        run: |
+          sudo rm -rf /usr/lib/jvm/temurin-8-jdk-amd64 || true
+          sudo rm -rf /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64 || true
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
