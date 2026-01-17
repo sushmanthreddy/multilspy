@@ -18,13 +18,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.x"
         cache: "pip"
 
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.21'
+        go-version: "stable"
 
     - name: Install gopls
       run: go install golang.org/x/tools/gopls@latest
@@ -32,7 +32,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.4'
+        ruby-version: "ruby"  # Latest stable Ruby
 
     - name: Install Solargraph
       run: gem install solargraph
@@ -40,7 +40,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: "lts/*"  # Latest LTS version
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
@@ -48,8 +48,8 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
-        java-version: '17'
+        distribution: "temurin"
+        java-version: "17"  # LTS version required by Eclipse JDT.LS
 
     - name: Remove problematic JDK installations
       run: |
