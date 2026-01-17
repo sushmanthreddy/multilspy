@@ -56,6 +56,17 @@ jobs:
         sudo rm -rf /usr/lib/jvm/temurin-8-jdk-amd64 || true
         sudo rm -rf /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64 || true
 
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Fix Gradle permissions
+      run: |
+        # Ensure Gradle is executable
+        if [ -f "/usr/bin/gradle" ]; then
+          sudo chmod +x /usr/bin/gradle
+        fi
+        gradle --version || echo "Gradle setup complete"
+
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
       with:

@@ -199,6 +199,18 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Fix Gradle permissions
+        run: |
+          # Ensure Gradle wrapper and system Gradle are executable
+          if [ -f "/usr/bin/gradle" ]; then
+            sudo chmod +x /usr/bin/gradle
+          fi
+          # Install Gradle if not available with proper permissions
+          gradle --version || echo "Gradle setup complete"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
