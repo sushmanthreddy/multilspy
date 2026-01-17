@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -52,7 +52,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -83,7 +83,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -111,7 +111,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -137,7 +137,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -173,7 +173,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -199,48 +199,10 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Fix build tool permissions
-        run: |
-          # Fix Gradle permissions - the system gradle might exist but not be executable
-          # The Kotlin Language Server uses `which gradle` to find it
-          if [ -f "/usr/bin/gradle" ]; then
-            sudo chmod +x /usr/bin/gradle
-            # Also ensure the actual gradle script it points to is executable
-            if [ -L "/usr/bin/gradle" ]; then
-              GRADLE_TARGET=$(readlink -f /usr/bin/gradle)
-              sudo chmod +x "$GRADLE_TARGET" || true
-            fi
-          fi
-          # Fix Maven permissions - same issue
-          if [ -f "/usr/bin/mvn" ]; then
-            sudo chmod +x /usr/bin/mvn
-            if [ -L "/usr/bin/mvn" ]; then
-              MVN_TARGET=$(readlink -f /usr/bin/mvn)
-              sudo chmod +x "$MVN_TARGET" || true
-            fi
-          fi
-          # Ensure any gradle/mvn binaries in common locations are executable
-          for dir in /opt /usr/share /usr/local; do
-            find "$dir" -name "gradle" -type f 2>/dev/null | xargs -I {} sudo chmod +x {} || true
-            find "$dir" -name "mvn" -type f 2>/dev/null | xargs -I {} sudo chmod +x {} || true
-          done
-          # Verify tools are working
-          echo "Gradle version:"
-          gradle --version || echo "Gradle not available via PATH"
-          echo "Maven version:"
-          mvn --version || echo "Maven not available via PATH"
-          echo "Which gradle:"
-          which gradle || true
-          echo "Which mvn:"
-          which mvn || true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -263,7 +225,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -286,7 +248,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -314,7 +276,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies
@@ -337,7 +299,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install dependencies

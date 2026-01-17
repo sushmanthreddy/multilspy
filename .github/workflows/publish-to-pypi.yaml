@@ -18,13 +18,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.x"
+        python-version: "3.11"
         cache: "pip"
 
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: "1.21"
+        go-version: '1.21'
 
     - name: Install gopls
       run: go install golang.org/x/tools/gopls@latest
@@ -32,7 +32,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "3.4"
+        ruby-version: '3.4'
 
     - name: Install Solargraph
       run: gem install solargraph
@@ -40,7 +40,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: "20"
+        node-version: '20'
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
@@ -48,24 +48,13 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v4
       with:
-        distribution: "temurin"
-        java-version: "17"
+        distribution: 'temurin'
+        java-version: '17'
 
     - name: Remove problematic JDK installations
       run: |
         sudo rm -rf /usr/lib/jvm/temurin-8-jdk-amd64 || true
         sudo rm -rf /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64 || true
-
-    - name: Set up Gradle
-      uses: gradle/actions/setup-gradle@v4
-
-    - name: Fix Gradle permissions
-      run: |
-        # Ensure Gradle is executable
-        if [ -f "/usr/bin/gradle" ]; then
-          sudo chmod +x /usr/bin/gradle
-        fi
-        gradle --version || echo "Gradle setup complete"
 
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
