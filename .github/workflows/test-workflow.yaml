@@ -296,21 +296,103 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.x"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
           cache: "pip"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install -e .
 
       - name: Run sync timeout tests
         run: |
           pytest tests/multilspy/test_*timeout*.py -v --tb=short
+
+  # Catch-all job to ensure no tests are silently skipped
+  # This job finds any test files that don't match existing job patterns
+  # and fails if such tests exist, alerting developers to add a dedicated job
+  test-catch-all:
+    name: Catch-All (Uncovered Tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find uncovered test files
+        id: find-uncovered
+        run: |
+          # Define patterns that are covered by existing jobs
+          # These must match the patterns used in the test jobs above
+          covered_patterns=(
+            "python"
+            "go"
+            "ruby"
+            "typescript"
+            "javascript"
+            "rust"
+            "java"
+            "kotlin"
+            "dart"
+            "clangd"
+            "csharp"
+            "timeout"
+          )
+          
+          # Build grep pattern to exclude covered tests
+          exclude_pattern=$(IFS="|"; echo "${covered_patterns[*]}")
+          
+          # Find all test files and filter out covered ones
+          # Only match test_*.py files (not helper files like multilspy_context.py)
+          uncovered_tests=$(find tests/multilspy -name "test_*.py" -type f | grep -vE "($exclude_pattern)" || true)
+          
+          if [[ -n "$uncovered_tests" ]]; then
+            echo "Found uncovered test files:"
+            echo "$uncovered_tests"
+            echo "uncovered=true" >> $GITHUB_OUTPUT
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "$uncovered_tests" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "All test files are covered by existing jobs."
+            echo "uncovered=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Python
+        if: steps.find-uncovered.outputs.uncovered == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: "pip"
+
+      - name: Install dependencies
+        if: steps.find-uncovered.outputs.uncovered == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run uncovered tests
+        if: steps.find-uncovered.outputs.uncovered == 'true'
+        run: |
+          echo "WARNING: The following test files are not covered by any dedicated test job:"
+          echo "${{ steps.find-uncovered.outputs.files }}"
+          echo ""
+          echo "Please add a dedicated job for these tests in .github/workflows/test-workflow.yaml"
+          echo "Running these tests with basic Python setup (they may fail if they require additional dependencies)..."
+          echo ""
+          pytest ${{ steps.find-uncovered.outputs.files }} -v --tb=short
+
+      - name: Verify all tests are covered
+        run: |
+          # This step always runs to provide a clear message
+          if [[ "${{ steps.find-uncovered.outputs.uncovered }}" == "true" ]]; then
+            echo "::warning::Some test files are not covered by dedicated test jobs. Please add appropriate jobs for them."
+          else
+            echo "All test files are covered by dedicated test jobs."
+          fi
 
   # Final job to check all tests passed
   all-tests-passed:
@@ -327,11 +409,12 @@ jobs:
       - test-clangd
       - test-csharp
       - test-sync-timeout
+      - test-catch-all
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Check all tests passed
-      run: |
+        run: |
           results=(
             "${{ needs.test-python.result }}"
             "${{ needs.test-go.result }}"
@@ -344,6 +427,7 @@ jobs:
             "${{ needs.test-clangd.result }}"
             "${{ needs.test-csharp.result }}"
             "${{ needs.test-sync-timeout.result }}"
+            "${{ needs.test-catch-all.result }}"
           )
           
           failed=0
